@@ -189,6 +189,23 @@ def get_items(pos_profile, price_list=None):
                 filters={"parent": item_code},
                 fields=["barcode", "posa_uom"],
             )
+            item_tags = list(set(tag.tag for tag in frappe.get_all(
+                "Tag Link",
+                filters={
+                    "document_type": "Item", 
+                    "document_name": item_code
+                },
+                fields=["tag"]
+            ) if tag))
+            item_batch_data = frappe.get_all(
+                "Batch",
+                filters={"disabled": 0, "item": item_code},
+                or_filters=[
+                    ["expiry_date", "in", ["", None]],
+                    ["expiry_date", "<=", nowdate()]
+                ],
+                fields=["batch_id"],
+            )
             serial_no_data = []
             if pos_profile.get("posa_search_serial_no"):
                 serial_no_data = frappe.get_all(
@@ -223,6 +240,8 @@ def get_items(pos_profile, price_list=None):
                         "currency": item_price.get("currency")
                         or pos_profile.get("currency"),
                         "item_barcode": item_barcode or [],
+                        "item_batch_data": item_batch_data or [],
+                        "item_tags": item_tags or [],
                         "actual_qty": 0,
                         "serial_no_data": serial_no_data or [],
                         "attributes": attributes or "",
@@ -260,7 +279,7 @@ def get_root_of(doctype):
 def get_items_groups():
     return frappe.db.sql(
         """
-        select name 
+        select name
         from `tabItem Group`
         where is_group = 0
         order by name
@@ -317,7 +336,7 @@ def get_customer_names(pos_profile):
         FROM `tabCustomer`
         WHERE {0}
         ORDER by name
-        LIMIT 0, 10000 
+        LIMIT 0, 10000
         """.format(
             condition
         ),
@@ -1007,7 +1026,7 @@ def get_offers(profile):
         """
         SELECT *
         FROM `tabPOS Offer`
-        WHERE 
+        WHERE
         disable = 0 AND
         company = %(company)s AND
         (pos_profile is NULL OR pos_profile  = '' OR  pos_profile = %(pos_profile)s) AND
@@ -1025,7 +1044,7 @@ def get_offers(profile):
 def get_customer_addresses(customer):
     return frappe.db.sql(
         """
-        SELECT 
+        SELECT
             address.name,
             address.address_line1,
             address.address_line2,

@@ -249,11 +249,15 @@ export default {
       if (this.flags.serial_no) {
         new_item.to_set_serial_no = this.flags.serial_no;
       }
+      if (this.flags.batch_id) {
+        new_item.batch_no = this.flags.batch_id;
+      }
       this.add_item(new_item);
       this.search = null;
       this.first_search = null;
       this.debounce_search = null;
       this.flags.serial_no = null;
+      this.flags.batch_id = null;
     },
     get_item_qty(first_search) {
       let scal_qty = 1;
@@ -395,6 +399,25 @@ export default {
             filtred_list = filtred_group_list.filter((item) =>
               item.item_code.toLowerCase().includes(this.search.toLowerCase())
             );
+          }
+          if (filtred_list.length == 0) {
+            filtred_list = filtred_group_list.filter((item) =>
+              item.item_tags.includes(this.search.toLowerCase())
+            );
+          }
+          if (filtred_list.length == 0) {
+            filtred_list = filtred_group_list.filter((item) => {
+              let found = false;
+              for (let element of item.item_batch_data) {
+                if (element.batch_id == this.search) {
+                  found = true;
+                  this.flags.batch_id = null;
+                  this.flags.batch_id = this.search;
+                  break;
+                }
+              }
+              return found;
+            });
           }
           if (
             filtred_list.length == 0 &&
