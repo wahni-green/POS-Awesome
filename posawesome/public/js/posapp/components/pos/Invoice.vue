@@ -631,6 +631,7 @@ export default {
       invoice_doc: '',
       return_doc: '',
       customer: '',
+      doctor_name: '',
       customer_info: '',
       discount_amount: 0,
       additional_discount_percentage: 0,
@@ -857,6 +858,8 @@ export default {
       this.customer = this.pos_profile.customer;
       this.invoice_doc = '';
       this.return_doc = '';
+      evntBus.$emit('set_doctor_name', '');
+      this.doctor_name = '';
       this.discount_amount = 0;
       this.additional_discount_percentage = 0;
       evntBus.$emit('set_customer_readonly', false);
@@ -869,6 +872,8 @@ export default {
       evntBus.$emit('set_pos_coupons', []);
       this.posa_coupons = [];
       this.return_doc = '';
+      evntBus.$emit('set_doctor_name', '');
+      this.doctor_name = '';
       const doc = this.get_invoice_doc();
       if (doc.name) {
         this.update_invoice(doc);
@@ -935,6 +940,7 @@ export default {
       doc.currency = doc.currency || this.pos_profile.currency;
       doc.naming_series = doc.naming_series || this.pos_profile.naming_series;
       doc.customer = this.customer;
+      doc.doctor_name = this.doctor_name;
       doc.items = this.get_invoice_items();
       doc.total = this.subtotal;
       doc.discount_amount = flt(this.discount_amount);
@@ -2236,6 +2242,9 @@ export default {
     });
     evntBus.$on('update_customer', (customer) => {
       this.customer = customer;
+    });
+    evntBus.$on('update_doctor_name', (doctor_name) => {
+      this.doctor_name = doctor_name;
     });
     evntBus.$on('new_invoice', () => {
       this.invoice_doc = '';

@@ -52,6 +52,17 @@
         </template>
       </template>
     </v-autocomplete>
+    <v-text-field
+      class="mt-2"
+      label="Doctor"
+      dense
+      outlined
+      prepend-inner-icon="mdi-medical-bag"
+      background-color="white"
+      hide-details
+      v-model="doctor_name"
+      :disabled="readonly"
+    ></v-text-field>
   </div>
 </template>
 
@@ -62,6 +73,7 @@ export default {
     pos_profile: '',
     customers: [],
     customer: '',
+    doctor_name: '',
     readonly: false,
   }),
 
@@ -128,6 +140,9 @@ export default {
       evntBus.$on('set_customer', (customer) => {
         this.customer = customer;
       });
+      evntBus.$on('set_doctor_name', (doctor_name) => {
+        this.doctor_name = doctor_name;
+      });
       evntBus.$on('add_customer_to_list', (customer) => {
         this.customers.push(customer);
       });
@@ -140,6 +155,9 @@ export default {
   watch: {
     customer() {
       evntBus.$emit('update_customer', this.customer);
+    },
+    doctor_name() {
+      evntBus.$emit('update_doctor_name', this.doctor_name);
     },
   },
 };
