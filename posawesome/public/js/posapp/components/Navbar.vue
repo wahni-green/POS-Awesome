@@ -18,6 +18,9 @@
       <v-btn style="cursor: unset" text color="grey">
         <span right>{{ pos_profile.name }}</span>
       </v-btn>
+      <v-btn text color="grey" @click="open_enq">
+        <span right>Enquiry</span>
+      </v-btn>
       <div class="text-center">
         <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
@@ -178,6 +181,9 @@ export default {
       this.snack = true;
       this.snackColor = data.color;
       this.snackText = data.text;
+    },
+    open_enq(data) {
+      evntBus.$emit('open_itemEnquiry');
     },
     logOut() {
       var me = this;

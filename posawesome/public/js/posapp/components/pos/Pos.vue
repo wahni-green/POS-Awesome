@@ -1,6 +1,7 @@
 <template>
   <div fluid>
     <ClosingDialog></ClosingDialog>
+    <ItemEnquiry></ItemEnquiry>
     <Drafts></Drafts>
     <Returns></Returns>
     <NewCustomer></NewCustomer>
@@ -73,6 +74,7 @@ import PosOffers from './PosOffers.vue';
 import PosCoupons from './PosCoupons.vue';
 import Drafts from './Drafts.vue';
 import ClosingDialog from './ClosingDialog.vue';
+import ItemEnquiry from './ItemEnquiry.vue';
 import NewCustomer from './NewCustomer.vue';
 import EditCustomer from './EditCustomer.vue';
 import NewAddress from './NewAddress.vue';
@@ -99,6 +101,7 @@ export default {
     Payments,
     Drafts,
     ClosingDialog,
+    ItemEnquiry,
     NewCustomer,
     Returns,
     PosOffers,
@@ -224,7 +227,7 @@ export default {
     });
   },
 };
-</script> 
+</script>
 
 <style scoped>
 </style>
