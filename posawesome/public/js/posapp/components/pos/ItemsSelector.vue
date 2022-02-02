@@ -20,7 +20,7 @@
             outlined
             color="indigo"
             :label="frappe._('Search Items')"
-            hint="Search by item code, serial number, batch no or barcode"
+            hint="Search by item code, serial number, batch no, barcode or molecule"
             background-color="white"
             hide-details
             v-model="debounce_search"
@@ -394,6 +394,11 @@ export default {
           if (filtred_list.length == 0) {
             filtred_list = filtred_group_list.filter((item) =>
               item.item_code.toLowerCase().includes(this.search.toLowerCase())
+            );
+          }
+          if (filtred_list.length == 0) {
+            filtred_list = filtred_group_list.filter((item) =>
+              item.item_molecule.includes(this.search.toLowerCase())
             );
           }
           if (

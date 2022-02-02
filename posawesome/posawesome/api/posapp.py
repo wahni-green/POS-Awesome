@@ -189,6 +189,9 @@ def get_items(pos_profile, price_list=None):
                 filters={"parent": item_code},
                 fields=["barcode", "posa_uom"],
             )
+            item_molecule = [x.lower() for x in frappe.get_all("Item Molecule", filters={
+                "parent": item_code
+            }, pluck="molecule")]
             serial_no_data = []
             if pos_profile.get("posa_search_serial_no"):
                 serial_no_data = frappe.get_all(
@@ -223,6 +226,7 @@ def get_items(pos_profile, price_list=None):
                         "currency": item_price.get("currency")
                         or pos_profile.get("currency"),
                         "item_barcode": item_barcode or [],
+                        "item_molecule": item_molecule or [],
                         "actual_qty": 0,
                         "serial_no_data": serial_no_data or [],
                         "attributes": attributes or "",
@@ -260,7 +264,7 @@ def get_root_of(doctype):
 def get_items_groups():
     return frappe.db.sql(
         """
-        select name 
+        select name
         from `tabItem Group`
         where is_group = 0
         order by name
@@ -317,7 +321,7 @@ def get_customer_names(pos_profile):
         FROM `tabCustomer`
         WHERE {0}
         ORDER by name
-        LIMIT 0, 10000 
+        LIMIT 0, 10000
         """.format(
             condition
         ),
@@ -1007,7 +1011,7 @@ def get_offers(profile):
         """
         SELECT *
         FROM `tabPOS Offer`
-        WHERE 
+        WHERE
         disable = 0 AND
         company = %(company)s AND
         (pos_profile is NULL OR pos_profile  = '' OR  pos_profile = %(pos_profile)s) AND
@@ -1025,7 +1029,7 @@ def get_offers(profile):
 def get_customer_addresses(customer):
     return frappe.db.sql(
         """
-        SELECT 
+        SELECT
             address.name,
             address.address_line1,
             address.address_line2,
