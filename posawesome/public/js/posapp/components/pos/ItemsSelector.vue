@@ -397,9 +397,23 @@ export default {
             );
           }
           if (filtred_list.length == 0) {
-            filtred_list = filtred_group_list.filter((item) =>
-              item.item_molecule.includes(this.search.toLowerCase())
-            );
+            filtred_list = filtred_group_list.filter((item) => {
+              let found = true;
+              for (let term of this.search.toLowerCase().split(" ")){
+                  if (found) {
+                      found = false;
+                  } else {
+                      break;
+                  }
+                  for (let element of item.item_molecule) {
+                    if (element.includes(term)) {
+                      found = true;
+                      break;
+                    }
+                  }
+              };
+              return found;
+            });
           }
           if (
             filtred_list.length == 0 &&

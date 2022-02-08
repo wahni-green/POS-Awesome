@@ -6,7 +6,7 @@
           <v-container>
             <v-row>
               <v-col cols="12" class="pa-1">
-                  <v-text-field
+                  <v-autocomplete
                     class="mx-auto w-75"
                     label="Medicine Name"
                     dense
@@ -14,8 +14,10 @@
                     prepend-inner-icon="mdi-medical-bag"
                     background-color="white"
                     hide-details
+                    clearable
                     v-model="medicine"
-                  ></v-text-field>
+                    :items="items"
+                  ></v-autocomplete>
               </v-col>
             </v-row>
           </v-container>
@@ -35,6 +37,7 @@ import { evntBus } from '../../bus';
 export default {
   data: () => ({
     itemEnquiry: false,
+    items: []
   }),
   watch: {},
   methods: {
@@ -42,12 +45,20 @@ export default {
       this.itemEnquiry = false;
     },
     submit_enq() {
-      // evntBus.$emit('submit_closing_pos', this.dialog_data);
+      frappe.call({
+          method: "idl4gen.tasks.add_enquiry",
+          args: {
+            "item_code": this.medicine
+          }
+      })
       this.itemEnquiry = false;
     }
   },
   created: function () {
     evntBus.$on('open_itemEnquiry', () => {
+      JSON.parse(localStorage.getItem('items_storage')).forEach((element) => {
+        this.items.push(element.item_code);
+      });
       this.itemEnquiry = true;
     });
   },
