@@ -50,6 +50,7 @@
             class="elevation-1"
             :items-per-page="itemsPerPage"
             hide-default-footer
+            :item-class="itemRowBackground"
           >
             <template v-slot:item.qty="{ item }">{{
               formtCurrency(item.qty)
@@ -702,6 +703,10 @@ export default {
   },
 
   methods: {
+    itemRowBackground(item) {
+        return item.pres_reqd ? 'bg-danger' : ''
+    },
+
     remove_item(item) {
       const index = this.items.findIndex(
         (el) => el.posa_row_id == item.posa_row_id
