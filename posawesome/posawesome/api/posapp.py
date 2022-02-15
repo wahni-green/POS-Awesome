@@ -137,6 +137,7 @@ def get_items(pos_profile, price_list=None):
             has_variants,
             variant_of,
             item_group,
+            pres_reqd,
             idx as idx,
             has_batch_no,
             has_serial_no,
