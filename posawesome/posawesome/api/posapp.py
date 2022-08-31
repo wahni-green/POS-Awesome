@@ -122,6 +122,11 @@ def get_items(pos_profile, price_list=None):
     condition += get_item_group_condition(pos_profile.get("name"))
     if not pos_profile.get("posa_show_template_items"):
         condition += " AND has_variants = 0"
+    stock_items = frappe.db.get_all("Bin", filters={
+        "actual_qty": [">", 0],
+        "warehouse": pos_profile.get("warehouse")
+    }, pluck="item_code")
+    condition += f" AND item_code IN {tuple(stock_items)}"
 
     result = []
 
