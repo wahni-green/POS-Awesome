@@ -23,6 +23,7 @@ from erpnext.accounts.doctype.loyalty_program.loyalty_program import (
     get_loyalty_program_details_with_points,
 )
 from posawesome.posawesome.doctype.pos_coupon.pos_coupon import check_coupon_code
+from erpnext.stock.get_item_details import get_conversion_factor
 
 # from posawesome import console
 
@@ -191,6 +192,10 @@ def get_items(pos_profile, price_list=None):
                     or item_prices.get(item_code).get("None")
                     or {}
                 )
+                if not item_price:
+                    uom = item_prices.get(item_code).keys()[0]
+                    item_price = item_prices.get(item_code).get(uom)
+                    item_price["price_list_rate"] /= get_conversion_factor(item_code, uom).get("conversion_factor", 1)
             item_barcode = frappe.get_all(
                 "Item Barcode",
                 filters={"parent": item_code},
@@ -258,9 +263,9 @@ def get_root_of(doctype):
     """Get root element of a DocType with a tree structure"""
     result = frappe.db.sql(
         """select t1.name from `tab{0}` t1 where
-		(select count(*) from `tab{1}` t2 where
-			t2.lft < t1.lft and t2.rgt > t1.rgt) = 0
-		and t1.rgt > t1.lft""".format(
+        (select count(*) from `tab{1}` t2 where
+            t2.lft < t1.lft and t2.rgt > t1.rgt) = 0
+        and t1.rgt > t1.lft""".format(
             doctype, doctype
         )
     )
@@ -301,7 +306,7 @@ def get_child_nodes(group_type, root):
     lft, rgt = frappe.db.get_value(group_type, root, ["lft", "rgt"])
     return frappe.db.sql(
         """ Select name, lft, rgt from `tab{tab}` where
-			lft >= {lft} and rgt <= {rgt} order by lft""".format(
+            lft >= {lft} and rgt <= {rgt} order by lft""".format(
             tab=group_type, lft=lft, rgt=rgt
         ),
         as_dict=1,
@@ -794,10 +799,10 @@ def get_item_detail(item, doc=None, warehouse=None, price_list=None):
 def get_stock_availability(item_code, warehouse):
     latest_sle = frappe.db.sql(
         """select qty_after_transaction
-		from `tabStock Ledger Entry`
-		where is_cancelled = 0 and item_code = %s and warehouse = %s
-		order by posting_date desc, posting_time desc
-		limit 1""",
+        from `tabStock Ledger Entry`
+        where is_cancelled = 0 and item_code = %s and warehouse = %s
+        order by posting_date desc, posting_time desc
+        limit 1""",
         (item_code, warehouse),
         as_dict=1,
     )
@@ -1047,7 +1052,7 @@ def get_customer_addresses(customer):
             address.address_type
         FROM `tabAddress` as address
         INNER JOIN `tabDynamic Link` AS link
-				ON address.name = link.parent
+                ON address.name = link.parent
         WHERE link.link_doctype = 'Customer'
             AND link.link_name = '{0}'
             AND address.disabled = 0
