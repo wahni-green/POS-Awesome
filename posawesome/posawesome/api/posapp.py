@@ -193,7 +193,7 @@ def get_items(pos_profile, price_list=None):
                     or {}
                 )
                 if not item_price:
-                    uom = item_prices.get(item_code).keys()[0]
+                    uom = list(item_prices.get(item_code).keys())[0]
                     item_price = item_prices.get(item_code).get(uom)
                     item_price["price_list_rate"] /= get_conversion_factor(item_code, uom).get("conversion_factor", 1)
             item_barcode = frappe.get_all(
