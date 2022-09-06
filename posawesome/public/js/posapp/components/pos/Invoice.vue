@@ -598,7 +598,7 @@
                 class="pa-0"
                 color="success"
                 dark
-                @click="new_invoice"
+                @click="cancel_invoice"
                 >{{ __('New') }}</v-btn
               >
             </v-col>
