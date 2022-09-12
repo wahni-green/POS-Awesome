@@ -716,6 +716,7 @@ def get_items_details(pos_profile, items_data):
     result = []
 
     if len(items_data) > 0:
+        from erpnext.stock.doctype.batch.batch import get_batch_qty
         for item in items_data:
             item_code = item.get("item_code")
             item_stock_qty = get_stock_availability(item_code, warehouse)
@@ -736,8 +737,6 @@ def get_items_details(pos_profile, items_data):
             )
 
             batch_no_data = []
-            from erpnext.stock.doctype.batch.batch import get_batch_qty
-
             batch_list = get_batch_qty(warehouse=warehouse, item_code=item_code)
 
             if batch_list:
