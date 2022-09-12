@@ -174,6 +174,20 @@
                       "
                     ></v-text-field>
                   </v-col>
+                  <!-- Molecule Start -->
+                  <v-col cols="8">
+                    <v-text-field
+                      dense
+                      outlined
+                      color="indigo"
+                      :label="frappe._('Molecule')"
+                      background-color="white"
+                      hide-details
+                      v-model="item.item_molecule"
+                      disabled
+                    ></v-text-field>
+                  </v-col>
+                  <!-- Molecule End -->
                   <v-col cols="4">
                     <v-text-field
                       dense
