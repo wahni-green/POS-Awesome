@@ -139,7 +139,6 @@ def get_items(pos_profile, price_list=None):
             description,
             stock_uom,
             image,
-            strength,
             is_stock_item,
             has_variants,
             variant_of,
@@ -186,6 +185,16 @@ def get_items(pos_profile, price_list=None):
         for item in items_data:
             item_code = item.item_code
             item_price = {}
+            item_mrp = frappe.get_value(
+                "Item Price",
+                {
+                    "price_list": 'MRP',
+                    "item_code": item_code,
+                    "currency": pos_profile.get("currency"),
+                    "selling": 1,
+                },
+                'price_list_rate'
+            )
             if item_prices.get(item_code):
                 item_price = (
                     item_prices.get(item_code).get(item.stock_uom)
@@ -239,7 +248,8 @@ def get_items(pos_profile, price_list=None):
                         or pos_profile.get("currency"),
                         "item_barcode": item_barcode or [],
                         "item_molecule": item_molecule or [],
-                        "actual_qty": 0, 
+                        "mrp": item_mrp or 0.00,
+                        "actual_qty": 0,
                         "serial_no_data": serial_no_data or [],
                         "attributes": attributes or "",
                         "item_attributes": item_attributes or "",
