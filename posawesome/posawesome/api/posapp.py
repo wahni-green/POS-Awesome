@@ -23,6 +23,7 @@ from erpnext.accounts.doctype.loyalty_program.loyalty_program import (
     get_loyalty_program_details_with_points,
 )
 from posawesome.posawesome.doctype.pos_coupon.pos_coupon import check_coupon_code
+from erpnext.stock.get_item_details import get_conversion_factor
 
 # from posawesome import console
 
@@ -122,6 +123,11 @@ def get_items(pos_profile, price_list=None):
     condition += get_item_group_condition(pos_profile.get("name"))
     if not pos_profile.get("posa_show_template_items"):
         condition += " AND has_variants = 0"
+    stock_items = frappe.db.get_all("Bin", filters={
+        "actual_qty": [">", 0],
+        "warehouse": pos_profile.get("warehouse")
+    }, pluck="item_code")
+    condition += f" AND item_code IN {tuple(stock_items)}"
 
     result = []
 
@@ -133,6 +139,7 @@ def get_items(pos_profile, price_list=None):
             description,
             stock_uom,
             image,
+            strength,
             is_stock_item,
             has_variants,
             variant_of,
@@ -185,6 +192,10 @@ def get_items(pos_profile, price_list=None):
                     or item_prices.get(item_code).get("None")
                     or {}
                 )
+                if not item_price:
+                    uom = list(item_prices.get(item_code).keys())[0]
+                    item_price = item_prices.get(item_code).get(uom)
+                    item_price["price_list_rate"] /= get_conversion_factor(item_code, uom).get("conversion_factor", 1)
             item_barcode = frappe.get_all(
                 "Item Barcode",
                 filters={"parent": item_code},
@@ -228,7 +239,7 @@ def get_items(pos_profile, price_list=None):
                         or pos_profile.get("currency"),
                         "item_barcode": item_barcode or [],
                         "item_molecule": item_molecule or [],
-                        "actual_qty": 0,
+                        "actual_qty": 0, 
                         "serial_no_data": serial_no_data or [],
                         "attributes": attributes or "",
                         "item_attributes": item_attributes or "",
@@ -252,9 +263,9 @@ def get_root_of(doctype):
     """Get root element of a DocType with a tree structure"""
     result = frappe.db.sql(
         """select t1.name from `tab{0}` t1 where
-		(select count(*) from `tab{1}` t2 where
-			t2.lft < t1.lft and t2.rgt > t1.rgt) = 0
-		and t1.rgt > t1.lft""".format(
+        (select count(*) from `tab{1}` t2 where
+            t2.lft < t1.lft and t2.rgt > t1.rgt) = 0
+        and t1.rgt > t1.lft""".format(
             doctype, doctype
         )
     )
@@ -295,7 +306,7 @@ def get_child_nodes(group_type, root):
     lft, rgt = frappe.db.get_value(group_type, root, ["lft", "rgt"])
     return frappe.db.sql(
         """ Select name, lft, rgt from `tab{tab}` where
-			lft >= {lft} and rgt <= {rgt} order by lft""".format(
+            lft >= {lft} and rgt <= {rgt} order by lft""".format(
             tab=group_type, lft=lft, rgt=rgt
         ),
         as_dict=1,
@@ -705,6 +716,7 @@ def get_items_details(pos_profile, items_data):
     result = []
 
     if len(items_data) > 0:
+        from erpnext.stock.doctype.batch.batch import get_batch_qty
         for item in items_data:
             item_code = item.get("item_code")
             item_stock_qty = get_stock_availability(item_code, warehouse)
@@ -725,8 +737,6 @@ def get_items_details(pos_profile, items_data):
             )
 
             batch_no_data = []
-            from erpnext.stock.doctype.batch.batch import get_batch_qty
-
             batch_list = get_batch_qty(warehouse=warehouse, item_code=item_code)
 
             if batch_list:
@@ -788,10 +798,10 @@ def get_item_detail(item, doc=None, warehouse=None, price_list=None):
 def get_stock_availability(item_code, warehouse):
     latest_sle = frappe.db.sql(
         """select qty_after_transaction
-		from `tabStock Ledger Entry`
-		where item_code = %s and warehouse = %s
-		order by posting_date desc, posting_time desc
-		limit 1""",
+        from `tabStock Ledger Entry`
+        where is_cancelled = 0 and item_code = %s and warehouse = %s
+        order by posting_date desc, posting_time desc
+        limit 1""",
         (item_code, warehouse),
         as_dict=1,
     )
@@ -1041,7 +1051,7 @@ def get_customer_addresses(customer):
             address.address_type
         FROM `tabAddress` as address
         INNER JOIN `tabDynamic Link` AS link
-				ON address.name = link.parent
+                ON address.name = link.parent
         WHERE link.link_doctype = 'Customer'
             AND link.link_name = '{0}'
             AND address.disabled = 0
