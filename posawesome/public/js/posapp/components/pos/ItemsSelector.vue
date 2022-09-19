@@ -77,8 +77,8 @@
                   hide-default-footer
                   @click:row="add_item"
                 >
-                  <template v-slot:item.strength="{ item }">
-                    {{ item.strength }}
+                  <template v-slot:item.mrp="{ item }">
+                    {{ item.mrp }}
                   </template>
                   <template v-slot:item.rate="{ item }">
                     {{ formtCurrency(item.rate) }}
@@ -145,7 +145,7 @@ export default {
     itemsPerPage: 1000,
     items_headers: [
       { text: __('Name'), align: 'start', sortable: true, value: 'item_name' },
-      { text: __('Strength'), value: 'strength', align: 'start' },
+      { text: __('MRP'), value: 'mrp', align: 'start' },
       { text: __('Rate'), value: 'rate', align: 'start' },
       { text: __('QTY'), value: 'actual_qty', align: 'start' },
       { text: __('UOM'), value: 'stock_uom', align: 'start' },
