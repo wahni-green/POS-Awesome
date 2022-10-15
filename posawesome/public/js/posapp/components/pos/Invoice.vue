@@ -1490,13 +1490,15 @@ export default {
       );
       item.actual_batch_qty = batch_no.batch_qty;
       item.batch_no_expiry_date = batch_no.expiry_date;
-      if ((this.invoiceType != 'Return') && (batch_no.btach_price)) {
-        item.btach_price = batch_no.btach_price;
-        item.price_list_rate = batch_no.btach_price;
-        item.rate = batch_no.btach_price;
-      } else if (update) {
-        item.btach_price = null;
-        this.update_item_detail(item);
+      if (this.invoiceType != 'Return') {
+        if (batch_no.btach_price) {
+          item.btach_price = batch_no.btach_price;
+          item.price_list_rate = batch_no.btach_price;
+          item.rate = batch_no.btach_price;
+        } else if (update) {
+          item.btach_price = null;
+          this.update_item_detail(item);
+        }
       }
     },
 
