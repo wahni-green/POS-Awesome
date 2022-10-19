@@ -1488,9 +1488,9 @@ export default {
       const batch_no = item.batch_no_data.find(
         (element) => element.batch_no == value
       );
-      item.actual_batch_qty = batch_no.batch_qty;
-      item.batch_no_expiry_date = batch_no.expiry_date;
-      if (this.invoiceType != 'Return') {
+      if (batch_no && (this.invoiceType != 'Return')) {
+        item.actual_batch_qty = batch_no.batch_qty;
+        item.batch_no_expiry_date = batch_no.expiry_date;
         if (batch_no.btach_price) {
           item.btach_price = batch_no.btach_price;
           item.price_list_rate = batch_no.btach_price;
