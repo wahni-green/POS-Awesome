@@ -806,18 +806,10 @@ def get_item_detail(item, doc=None, warehouse=None, price_list=None):
 
 
 def get_stock_availability(item_code, warehouse):
-    latest_sle = frappe.db.sql(
-        """select qty_after_transaction
-        from `tabStock Ledger Entry`
-        where is_cancelled = 0 and item_code = %s and warehouse = %s
-        order by posting_date desc, posting_time desc
-        limit 1""",
-        (item_code, warehouse),
-        as_dict=1,
-    )
-
-    sle_qty = latest_sle[0].qty_after_transaction or 0 if latest_sle else 0
-    return sle_qty
+    return frappe.db.get_value("Bin", filters={
+        "warehouse": warehouse,
+        "item_code": item_code
+    }, pluck="actual_qty") or 0
 
 
 @frappe.whitelist()
