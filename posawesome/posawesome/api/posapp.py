@@ -806,10 +806,10 @@ def get_item_detail(item, doc=None, warehouse=None, price_list=None):
 
 
 def get_stock_availability(item_code, warehouse):
-    return frappe.db.get_value("Bin", filters={
+    return frappe.db.get_value("Bin", {
         "warehouse": warehouse,
         "item_code": item_code
-    }, pluck="actual_qty") or 0
+    }, "actual_qty") or 0
 
 
 @frappe.whitelist()
