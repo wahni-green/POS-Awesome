@@ -2353,6 +2353,7 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .border_line_bottom {
   border-bottom: 1px solid lightgray;
