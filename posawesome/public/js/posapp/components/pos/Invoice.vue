@@ -2319,6 +2319,7 @@ export default {
       evntBus.$emit('set_customer_info_to_edit', this.customer_info);
     },
     expanded(data_value) {
+      if (this.invoice_doc.is_return) return;
       this.update_items_details(data_value);
       if (data_value.length > 0) {
         this.update_item_detail(data_value[0]);
