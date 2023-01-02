@@ -56,11 +56,6 @@
                       class="text-subtitle-2 px-1 pb-2"
                     ></v-card-text>
                   </v-img>
-                  <v-card-text class="text--primary pa-1">
-                    <div class="text-caption indigo--text accent-3">
-                      {{ item.rate || 0 }} {{ item.currency || '' }}
-                    </div>
-                  </v-card-text>
                 </v-card>
               </v-col>
             </v-row>
@@ -79,9 +74,6 @@
                 >
                   <template v-slot:item.mrp="{ item }">
                     {{ item.mrp }}
-                  </template>
-                  <template v-slot:item.rate="{ item }">
-                    {{ formtCurrency(item.rate) }}
                   </template>
                   <template v-slot:item.actual_qty="{ item }">
                     {{ formtCurrency(item.actual_qty) }}
@@ -146,7 +138,6 @@ export default {
     items_headers: [
       { text: __('Name'), align: 'start', sortable: true, value: 'item_name' },
       { text: __('MRP'), value: 'mrp', align: 'start' },
-      { text: __('Rate'), value: 'rate', align: 'start' },
       { text: __('QTY'), value: 'actual_qty', align: 'start' },
       { text: __('UOM'), value: 'stock_uom', align: 'start' },
     ],
